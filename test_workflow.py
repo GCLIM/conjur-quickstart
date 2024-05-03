@@ -4,6 +4,7 @@ import sys
 import time
 import random
 import string
+import json
 
 def announce(message):
     print("++++++++++++++++++++++++++++++++++++++")
@@ -30,7 +31,7 @@ def execute_command(command):
         print(f"Error: {e}")
         cleanup(e.returncode, command)
 
-def login_as_admin(command):
+def execute_command_with_attempts(command, action):
     max_retries = 3
     retry_interval = 10
     retries = 0
@@ -38,21 +39,21 @@ def login_as_admin(command):
     while retries < max_retries:
         retries += 1
 
-        print(f"Attempt {retries}: Logging in as admin...")
+        print(f"Attempt {retries}: {action}")
         try:
-            execute_command(command)
-            print("Login successful")
+            subprocess.run(command, check=True, shell=True)
+            print(f"{action} successful")
             return
         except subprocess.CalledProcessError:
-            print("Login attempt failed")
+            print(f"{action} attempt failed")
+            if action == "Load BotApp.yml":
+                subprocess.run("podman exec --interactive conjur_client conjur policy replace -b root -f policy/DelBotApp.yml", check=True, shell=True)
             time.sleep(retry_interval)
 
-    print("Maximum retries reached. Failed to log in as admin.")
-    cleanup(1, "podman exec --interactive conjur_client conjur login -i admin -p ${admin_api_key}")
+    print(f"Maximum retries reached. Failed to {action}.")
+    cleanup(1, "{action}")
 
 if __name__ == "__main__":
-    subprocess.run(["set", "-euo", "pipefail"], check=True)
-    subprocess.run(["trap", "cleanup EXIT ABRT QUIT"], check=True)
 
     ps_output = subprocess.check_output(["podman-compose", "ps", "-q"])
     if ps_output:
@@ -92,12 +93,10 @@ if __name__ == "__main__":
 
     admin_api_key = subprocess.check_output(["awk", "/API key for admin/{print $NF}", "admin_data"]).decode().strip()
     command = f"podman exec --interactive conjur_client conjur login -i admin -p {admin_api_key}"
-    subprocess.run(["trap", "", "EXIT ABRT QUIT"], check=True)
-    login_as_admin(command)
+    execute_command_with_attempts(command,"Login as admin")
 
-    subprocess.run(["trap", "cleanup EXIT ABRT QUIT"], check=True)
-
-    execute_command("podman-compose exec -T client conjur policy load -b root -f policy/BotApp.yml > my_app_data")
+    command = "podman-compose exec -T client conjur policy load -b root -f policy/BotApp.yml > my_app_data"
+    execute_command_with_attempts(command, "Load BotApp.yml")
     print("")
 
     execute_command("podman-compose exec -T client conjur logout")
@@ -105,7 +104,12 @@ if __name__ == "__main__":
 
     announce("UNIT 3. Store a Secret in Conjur")
 
-    dave_api_key = subprocess.check_output(["awk", "'/\"api_key\":/{print $NF}'", "my_app_data"]).decode().strip()
+    file_path = 'my_app_data'
+    with open(file_path, 'r') as file:
+        json_data = file.read()
+    data = json.loads(json_data)
+    
+    dave_api_key = [role['api_key'] for role in data['created_roles'].values()][1]
     execute_command(f"podman-compose exec -T client conjur login -i Dave@BotApp -p {dave_api_key}")
     print("")
 
@@ -118,7 +122,7 @@ if __name__ == "__main__":
 
     announce("UNIT 4. Run the Demo App")
 
-    bot_api_key = subprocess.check_output(["awk", "'NR==1'"]).decode().strip()
+    bot_api_key = [role['api_key'] for role in data['created_roles'].values()][0]
     execute_command(f"podman-compose exec -T bot_app bash -c \"curl -d '{bot_api_key}' -k https://proxy/authn/myConjurAccount/host%2FBotApp%2FmyDemoApp/authenticate > /tmp/conjur_token\"")
     print("")
 
