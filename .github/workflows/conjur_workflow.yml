@@ -12,5 +12,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Run Worlflow Test Script
+
+      - name: Run Workflow Test Script
         run: python3 test_workflow.py
+        
+      - name: Clean Up
+        run: ./cleanup.sh
+
