@@ -22,5 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run Worlflow Test Script
+      - name: Run Workflow Test Script
         run: ./test_workflow.sh
+
+      - name: Clean Up
+        run: ./cleanup.sh
