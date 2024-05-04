@@ -1,21 +1,17 @@
 name: quick_start_flow_test
 on:
-
   pull_request:
     branches:
     - main
 
 jobs:
-
   tests:
     runs-on: conjur01
 
     steps:
       - uses: actions/checkout@v2
-
       - name: Run Workflow Test Script
-        run: python3 test_workflow.py
-        
+        run: python3 test_workflow.py      
       - name: Clean Up
         run: ./cleanup.sh
 
