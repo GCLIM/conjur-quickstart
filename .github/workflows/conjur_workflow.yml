@@ -1,22 +1,13 @@
 name: quick_start_flow_test
 on:
-  # Run this on pushes to main
-  push:
+
+  pull_request:
     branches:
     - main
 
-  # Or when PR operations are done
-  pull_request:
-    types:
-    - opened
-    - reopened
-    - synchronize
-
 jobs:
-  # runs through all the tasks listed in conjur-quickstart daily
-  # ensures that the quickstart flow is not broken for end users
 
-  setup-conjur-env:
+  tests:
     runs-on: conjur01
 
     steps:
