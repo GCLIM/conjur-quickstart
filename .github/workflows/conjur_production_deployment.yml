@@ -21,6 +21,14 @@ jobs:
                     username: ${{ vars.USER }}
                     key: ${{ secrets.SSH_PRIVATE_KEY }}
                     script: |
+                        if conjur -d .; then 
+                          echo Conjur directory existed
+                          echo clean up for redeployment
+                          cd conjur
+                          podman-compose down
+                          cd ..
+                          rm -Rf conjur
+                        fi
                         git clone https://github.com/GCLIM/conjur-quickstart.git conjur
                         cd conjur
                         git checkout production
