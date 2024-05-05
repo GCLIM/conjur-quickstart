@@ -3,6 +3,7 @@ on:
     push:
         branches:
         - production 
+        
 jobs:
     deploy:
         runs-on: conjur01
