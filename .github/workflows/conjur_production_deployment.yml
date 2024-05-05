@@ -21,8 +21,9 @@ jobs:
                     username: ${{ vars.USER }}
                     key: ${{ secrets.SSH_PRIVATE_KEY }}
                     script: |
-                        mkdir conjur && cd conjur
-                        git pull origin production
+                        git clone https://github.com/GCLIM/conjur-quickstart.git conjur
+                        cd conjur
+                        git checkout production
                         python3 test_workflow.py
 
             # - name: Deploy to Remote Server
