@@ -1,20 +1,16 @@
 name: Conjur Production Deployment
-
 on:
     push:
         branches:
         - production 
-        
 jobs:
     deploy:
         runs-on: conjur01
         environment: production
-
         steps:
             - uses: webfactory/ssh-agent@v0.5.3
               with:
-                ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }} 
-                
+                ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}        
             - name: Deploy to Remote Server
               run: |
-                ssh ${{ secrets.USER }}@${{ vars.TARGET_HOST_1 }} "git pull origin master && cd conjur-quickstarts && ./test_workflow.sh"
+                ssh ${{ vars.USER }}@${{ vars.TARGET_HOST_1 }} "git pull origin master && cd conjur-quickstarts && ./test_workflow.sh"
