@@ -13,6 +13,18 @@ jobs:
             - uses: webfactory/ssh-agent@v0.9.0
               with:
                   ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-            - name: Deploy to Remote Server
-              run: |
-                ssh ${{ vars.USER }}@${{ vars.TARGET_HOST_1 }} "git pull origin production && cd conjur-quickstarts && ./test_workflow.sh"
+
+            - name: Deploy code
+                uses: appleboy/ssh-action@master
+                with:
+                    host: ${{ vars.TARGET_HOST_1 }}
+                    username: ${{ vars.USER }}
+                    key: ${{ secrets.SSH_PRIVATE_KEY }}
+                    script: |
+                        mkdir conjur && cd conjur
+                        git pull origin production
+                        python3 test_workflow.py
+
+            # - name: Deploy to Remote Server
+            #   run: |
+            #     ssh ${{ vars.USER }}@${{ vars.TARGET_HOST_1 }} "git pull origin production && cd conjur-quickstarts && ./test_workflow.sh"
