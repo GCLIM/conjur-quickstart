@@ -15,4 +15,4 @@ jobs:
                 ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }} 
             - name: Deploy to Remote Server
               run: |
-                ssh ${{ secrets.USER }}@${{ TARGET_HOST_1 }} "git pull origin master && cd conjur-quickstarts && ./test_workflow.sh"
+                ssh ${{ secrets.USER }}@${{ vars.TARGET_HOST_1 }} "git pull origin master && cd conjur-quickstarts && ./test_workflow.sh"
