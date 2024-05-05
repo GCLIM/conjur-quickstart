@@ -1,8 +1,8 @@
 name: Conjur Production Deployment
 on:
     push:
-        branches:
-        - production 
+        tags:
+            - 'v*'
 
 jobs:
     deploy:
