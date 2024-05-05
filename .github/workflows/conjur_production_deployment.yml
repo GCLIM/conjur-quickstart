@@ -5,10 +5,10 @@ on:
         branches:
         - production 
 jobs:
-    deployment:
+    deploy:
         runs-on: conjur01
         environment: production
-        
+
         steps:
             - name: Setup SSH
             uses: webfactory/ssh-agent@v0.5.3
