@@ -38,7 +38,7 @@ jobs:
                     username: ${{ vars.USER }}
                     key: ${{ secrets.SSH_PRIVATE_KEY }}
                     script: |
-                        if conjur -d .; then 
+                        if [ -d conjur ]; then 
                           echo Conjur directory existed
                           echo clean up for redeployment
                           cd conjur
