@@ -48,7 +48,7 @@ jobs:
                         fi
                         git clone https://github.com/GCLIM/conjur-quickstart.git conjur
                         cd conjur
-                        git checkout production
+                        git checkout main
                         python3 test_workflow.py
 
             # - name: Deploy to Remote Server
